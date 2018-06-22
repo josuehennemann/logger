@@ -37,15 +37,15 @@ At the end of the day, log files will be compressed and a new empty log file wil
 Compression is done using gzip, but can be changed at any time to zip.
 To change the compression method, use the functions:
 ```
-Log.SetCompressModeGzip ()
-Log.SetCompressModeZip ()
+Log.SetCompressModeGzip()
+Log.SetCompressModeZip()
 ```
 #### Stack:
 
 By default, ERROR and WARN logs write a stack stating where the log was written. Example:
 ```
-func testWriteLog () {
-Log.Printf (ERROR, "test write stack")
+func testWriteLog() {
+  Log.Printf(ERROR, "test write stack")
 }
 ```
 Will log:
@@ -53,7 +53,7 @@ Will log:
 
 To change this setting use the function
 ```
-Log.SetStackTrace (map[int]bool{logger.WARN:true})
+Log.SetStackTrace(map[int]bool{logger.WARN:true})
 ```
 
 ### Contributors
