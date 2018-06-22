@@ -27,7 +27,7 @@ const (
 const (
 	TIME_SYNC          = time.Second
 	LOG_FLAGS          = log.LstdFlags
-	DEFAULT_MAXDEPTH   = 2
+	DEFAULT_MAXDEPTH   = 3
 	DEFAULT_STACKTRACE = true
 
 	LEVEL_ALL        = ACCESS | FATAL | ERROR | WARN | INFO | DEBUG
