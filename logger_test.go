@@ -20,7 +20,7 @@ func TestLoggerWithRotate(t *testing.T) {
 	}
 	defer logFile.Close()
 	logFile.Printf(ACCESS, "teste ACCESS")
-	logFile.Printf(FATAL, "teste FATAL")
+	//logFile.Printf(FATAL, "teste FATAL")
 	logFile.Printf(ERROR, "teste ERROR")
 	logFile.Printf(WARN, "teste WARN")
 	logFile.Printf(INFO, "teste INFO")
@@ -32,7 +32,7 @@ func TestLoggerWithRotate(t *testing.T) {
 	logFile.SetStackTrace(map[int]bool{ACCESS: true, INFO: true})
 
 	logFile.Printf(ACCESS, "teste ACCESS")
-	logFile.Printf(FATAL, "teste FATAL")
+	//logFile.Printf(FATAL, "teste FATAL")
 	logFile.Printf(ERROR, "teste ERROR")
 	logFile.Printf(WARN, "teste WARN")
 	logFile.Printf(INFO, "teste INFO")

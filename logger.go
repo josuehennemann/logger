@@ -167,6 +167,7 @@ func (l *Logger) Print(typeLog int, txt ...interface{}) {
 	l.checkPrintStack(typeLog, &str)
 
 	l.log.Print(l.GetTypeString(typeLog), str)
+	l.isFatal(typeLog)
 }
 
 // typeLog is a level log. Ex:INFO, ERROR, WARN
@@ -179,6 +180,7 @@ func (l *Logger) Println(typeLog int, txt ...interface{}) {
 	str := parsePrint(txt...)
 	l.checkPrintStack(typeLog, &str)
 	l.log.Println(l.GetTypeString(typeLog), str)
+	l.isFatal(typeLog)
 }
 
 // typeLog is a level log. Ex:INFO, ERROR, WARN
@@ -190,6 +192,7 @@ func (l *Logger) Printf(typeLog int, format string, txt ...interface{}) {
 	}
 	l.checkPrintStack(typeLog, &format)
 	l.log.Printf(l.GetTypeString(typeLog)+" "+format, txt...)
+	l.isFatal(typeLog)
 }
 
 // Same as the Print function but after writing to the file, it kills the application with an Exit (1)
@@ -200,8 +203,9 @@ func (l *Logger) Fatal(typeLog int, txt ...interface{}) {
 	str := parsePrint(txt...)
 	l.checkPrintStack(typeLog, &str)
 	l.log.Print(l.GetTypeString(typeLog), str)
-	l.fileHandler.Close()
-	os.Exit(1)
+	//	l.fileHandler.Close()
+	//	os.Exit(1)
+	l.closeAndKill()
 }
 
 // Same as the Printf function but after writing to the file, it kills the application with an Exit (1)
@@ -211,8 +215,9 @@ func (l *Logger) Fatalf(typeLog int, format string, txt ...interface{}) {
 	}
 	l.checkPrintStack(typeLog, &format)
 	l.log.Printf(l.GetTypeString(typeLog)+" "+format, txt...)
-	l.fileHandler.Close()
-	os.Exit(1)
+	//	l.fileHandler.Close()
+	//	os.Exit(1)
+	l.closeAndKill()
 }
 
 // Same as the Println function but after writing to the file, it kills the application with an Exit (1)
@@ -224,8 +229,9 @@ func (l *Logger) Fatalln(typeLog int, txt ...interface{}) {
 	str := parsePrint(txt...)
 	l.checkPrintStack(typeLog, &str)
 	l.log.Println(l.GetTypeString(typeLog), str)
-	l.fileHandler.Close()
-	os.Exit(1)
+	//l.fileHandler.Close()
+	//os.Exit(1)
+	l.closeAndKill()
 }
 
 // Private methods
@@ -282,6 +288,16 @@ func (l *Logger) moveFiles() (err error) {
 		return
 	}
 	return
+}
+func (l *Logger) isFatal(t int) {
+	if t != FATAL {
+		return
+	}
+	l.closeAndKill()
+}
+func (l *Logger) closeAndKill() {
+	l.fileHandler.Close()
+	os.Exit(1)
 }
 
 //rotate log file, always that alter day
