@@ -196,7 +196,8 @@ func (l *Logger) Printf(typeLog int, format string, txt ...interface{}) {
 }
 
 // Same as the Print function but after writing to the file, it kills the application with an Exit (1)
-func (l *Logger) Fatal(typeLog int, txt ...interface{}) {
+func (l *Logger) Fatal(txt ...interface{}) {
+	typeLog := FATAL
 	if !l.checkWrite(typeLog) {
 		return
 	}
@@ -205,11 +206,13 @@ func (l *Logger) Fatal(typeLog int, txt ...interface{}) {
 	l.log.Print(l.GetTypeString(typeLog), str)
 	//	l.fileHandler.Close()
 	//	os.Exit(1)
-	l.closeAndKill()
+	//l.closeAndKill()
+	l.isFatal(typeLog)
 }
 
 // Same as the Printf function but after writing to the file, it kills the application with an Exit (1)
-func (l *Logger) Fatalf(typeLog int, format string, txt ...interface{}) {
+func (l *Logger) Fatalf(format string, txt ...interface{}) {
+	typeLog := FATAL
 	if !l.checkWrite(typeLog) {
 		return
 	}
@@ -217,11 +220,13 @@ func (l *Logger) Fatalf(typeLog int, format string, txt ...interface{}) {
 	l.log.Printf(l.GetTypeString(typeLog)+" "+format, txt...)
 	//	l.fileHandler.Close()
 	//	os.Exit(1)
-	l.closeAndKill()
+	//l.closeAndKill()
+	l.isFatal(typeLog)
 }
 
 // Same as the Println function but after writing to the file, it kills the application with an Exit (1)
-func (l *Logger) Fatalln(typeLog int, txt ...interface{}) {
+func (l *Logger) Fatalln(txt ...interface{}) {
+	typeLog := FATAL
 	if !l.checkWrite(typeLog) {
 		return
 	}
@@ -231,7 +236,8 @@ func (l *Logger) Fatalln(typeLog int, txt ...interface{}) {
 	l.log.Println(l.GetTypeString(typeLog), str)
 	//l.fileHandler.Close()
 	//os.Exit(1)
-	l.closeAndKill()
+	//l.closeAndKill()
+	l.isFatal(typeLog)
 }
 
 // Private methods
