@@ -32,6 +32,8 @@ const (
 
 	LEVEL_ALL        = ACCESS | FATAL | ERROR | WARN | INFO | DEBUG
 	LEVEL_PRODUCTION = LEVEL_ALL ^ DEBUG
+
+	DEFAULT_WRITESTACKTRACE = ERROR | WARN
 )
 
 const (
@@ -45,8 +47,6 @@ var (
 	logTypes_EnumValue = map[string]int{"ACCESS": ACCESS, "FATAL": FATAL, "ERROR": ERROR, "WARN": WARN, "INFO": INFO, "DEBUG": DEBUG}
 	level_EnumName     = map[int]string{LEVEL_ALL: "LEVEL_ALL", LEVEL_PRODUCTION: "LEVEL_PRODUCTION"}
 	level_EnumValue    = map[string]int{"LEVEL_ALL": LEVEL_ALL, "LEVEL_PRODUCTION": LEVEL_PRODUCTION}
-
-	DEFAULT_WRITESTACKTRACE = map[int]bool{ERROR: true, WARN: true} //uppercase to "simulate" a const
 )
 
 // Struct Logger
@@ -58,7 +58,7 @@ type Logger struct {
 	time_sync       time.Duration
 	level_log       int
 	rotateFiles     bool
-	writeStackTrace map[int]bool
+	writeStackTrace int
 	compressMode    int
 	maxDepth        int
 	dirPath         string
@@ -107,7 +107,7 @@ func New(fp string, level int, rotate bool) (l *Logger, err error) {
 // Public Methods Set's
 
 //define log types write stack trace
-func (l *Logger) SetStackTrace(list map[int]bool) {
+func (l *Logger) SetStackTrace(list int) {
 	l.writeStackTrace = list
 }
 
@@ -338,7 +338,7 @@ func (l *Logger) whoPrintStack() string {
 
 //check log level write stack
 func (l *Logger) checkPrintStack(typeLog int, str *string) {
-	if _, ok := l.writeStackTrace[typeLog]; ok {
+	if l.writeStackTrace &typeLog != 0 {
 		*str = l.whoPrintStack() + *str
 	}
 }

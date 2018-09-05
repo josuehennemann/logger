@@ -53,7 +53,7 @@ Will log:
 
 To change this setting use the function
 ```
-Log.SetStackTrace(map[int]bool{logger.WARN:true})
+Log.SetStackTrace(logger.WARN|logger.INFO)
 ```
 
 ### Contributors

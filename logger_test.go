@@ -32,7 +32,7 @@ func TestLoggerWithRotate(t *testing.T) {
 
 	logFile.Printf(INFO, "Alter types write stack")
 
-	logFile.SetStackTrace(map[int]bool{ACCESS: true, INFO: true})
+	logFile.SetStackTrace(ACCESS|INFO)
 
 	logFile.Printf(ACCESS, "teste ACCESS")
 	//logFile.Printf(FATAL, "teste FATAL")
