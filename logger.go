@@ -10,6 +10,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"regexp"
 	"runtime"
 	"strings"
 	"time"
@@ -63,6 +64,7 @@ type Logger struct {
 	maxDepth        int
 	dirPath         string
 	filename        string
+	removeAfter     uint16 //flag who indicate to remove rotate files after X days
 }
 
 //Creates a new instance of logger
@@ -97,6 +99,7 @@ func New(fp string, level int, rotate bool) (l *Logger, err error) {
 	if l.rotateFiles {
 		l.SetCompressModeGzip()
 		go l.rotateFile()
+		go l.removeFiles()
 	}
 
 	go l.sync()
@@ -138,6 +141,11 @@ func (l *Logger) SetCompressModeGzip() {
 //note: works only with active file rotation
 func (l *Logger) SetCompressModeZip() {
 	l.setCompressMode(COMPRESS_ZIP)
+}
+
+//define max day to remove files after rotate
+func (l *Logger) SetRemoveAfter(day uint16) {
+	l.removeAfter = day
 }
 
 func (l *Logger) WritePanic(rec interface{}, stack []byte) {
@@ -338,7 +346,7 @@ func (l *Logger) whoPrintStack() string {
 
 //check log level write stack
 func (l *Logger) checkPrintStack(typeLog int, str *string) {
-	if l.writeStackTrace &typeLog != 0 {
+	if l.writeStackTrace&typeLog != 0 {
 		*str = l.whoPrintStack() + *str
 	}
 }
@@ -448,7 +456,48 @@ func (l *Logger) compressZip(oldFile *string) error {
 	return err
 
 }
+func (l *Logger) removeFiles() {
+	filename := l.filename
+	if n := strings.LastIndex(l.filename, "."); n != -1 {
+		filename = filename[:n]
+	}
 
+	regexpToRemove := regexp.MustCompile(filename + "_([0-9]+).log.gz")
+	for {
+		if l.removeAfter == 0 {
+			time.Sleep(time.Hour * 24)
+			continue
+		}
+
+		dayRemoves := time.Duration(time.Hour * 24 * time.Duration(l.removeAfter))
+
+		files, err := ioutil.ReadDir(l.dirPath)
+		if err != nil {
+			continue
+		}
+
+		for _, f := range files {
+			//ignore dirs
+			if f.IsDir() {
+				continue
+			}
+
+			//check is file this Logger pointer
+			if !regexpToRemove.MatchString(f.Name()) {
+				continue
+			}
+			//check mod time of file
+			if time.Since(f.ModTime()) <= dayRemoves {
+				continue
+			}
+
+			//remove file
+			os.Remove(filepath.Join(l.dirPath, f.Name()))
+		}
+
+		time.Sleep(time.Hour * 24)
+	}
+}
 func parsePrint(r ...interface{}) (v string) {
 	for e := range r {
 		v += fmt.Sprintf("%v", r[e])
