@@ -65,6 +65,7 @@ type Logger struct {
 	dirPath         string
 	filename        string
 	removeAfter     uint16 //flag who indicate to remove rotate files after X days
+	setOutputTerm   bool //flag to debug, show log in terminal, dont use in production
 }
 
 //Creates a new instance of logger
@@ -108,6 +109,12 @@ func New(fp string, level int, rotate bool) (l *Logger, err error) {
 }
 
 // Public Methods Set's
+func (l *Logger) SetOutputTerm() {
+	l.setOutputTerm = true
+	l.log = log.New(os.Stderr, "", log.LstdFlags)
+}
+
+
 
 //define log types write stack trace
 func (l *Logger) SetStackTrace(list int) {
@@ -158,6 +165,9 @@ func (l *Logger) WritePanic(rec interface{}, stack []byte) {
 
 // Close log file
 func (l *Logger) Close() {
+	if l.setOutputTerm{
+		return
+	}
 	l.fileHandler.Close()
 }
 
@@ -253,6 +263,9 @@ func (l *Logger) Fatalln(txt ...interface{}) {
 // save log in disk
 func (l *Logger) sync() {
 	for {
+		if l.setOutputTerm{
+			return
+		}
 
 		if _, er := os.Stat(l.filepath); er != nil {
 			var err error
@@ -319,6 +332,10 @@ func (l *Logger) rotateFile() {
 	date := time.Now()
 	currentDate := date
 	for {
+		if l.setOutputTerm{
+			return
+		}
+
 		date = time.Now()
 		//move and rotate files, if alter day
 		if date.Day() != currentDate.Day() {
@@ -464,6 +481,10 @@ func (l *Logger) removeFiles() {
 
 	regexpToRemove := regexp.MustCompile(filename + "_([0-9]+).log.gz")
 	for {
+		if l.setOutputTerm{
+			return
+		}
+
 		if l.removeAfter == 0 {
 			time.Sleep(time.Hour * 24)
 			continue
